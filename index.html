@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Elnathan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* Header */
+        header {
+            position: fixed; 
+            top: 0; /* Memastikan header berada di bagian atas */
+            left: 0; /* Mengatur header berada di sisi kiri */
+            width: 100%; /* Mengatur lebar header memenuhi layar */
+            z-index: 1000; /* Memastikan header berada di atas konten lain */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.864); /* Menambahkan bayangan pada header */
+            background-color: #ff00007e;
+            color: white;
+            padding: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            margin: 0;
+            font: 100px;
+        }
+
+        .search-bar {
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .search-bar input {
+            border: none;
+            padding: 10px;
+            outline: none;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .search-btn {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 0 20px 20px 0;
+        }
+
+        .search-btn:hover {
+            background-color: #777;
+        }
+
+        /* Banner iklan */
+        .ad-banner {
+            margin: 0px 0;
+            text-align: center;
+        }
+
+        .ad-banner img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        /* Menu berbentuk icon */
+        .icon-menu ul {
+            display: flex;
+            justify-content: space-around;
+            list-style-type: none;
+            background-color: #333;
+            padding: 10px;
+        }
+
+        .icon-menu li {
+            text-align: center;
+        }
+
+        .icon-menu li a {
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+            display: block;
+        }
+
+        .icon-menu li a span {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .icon-menu li a:hover {
+            color: #f39c12;
+        }
+
+        /* Wrapper Produk untuk Scroll */
+        .products-wrapper {
+            overflow-x: auto;
+            padding-bottom: 20px; /* Memberikan ruang untuk scroll */
+            white-space: nowrap; /* Mencegah baris baru */
+        }
+
+        .products {
+            display: flex;
+            gap: 20px; /* Jarak antar produk */
+        }
+
+        .product-item {
+            background-color: rgb(255, 255, 255);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.857);
+            padding: 20px;
+            text-align: center;
+            margin: 10px;
+            width: 200px;
+            display: inline-block; /* Agar produk ditampilkan secara horizontal */
+        }
+
+        .product-item img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .product-item h3 {
+            margin: 10px 0;
+        }
+
+        .product-item p {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .product-item button {
+            background-color: #f39c12;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .product-item button:hover {
+            background-color: #e67e22;
+        }
+
+        /* Keranjang dan Pembayaran */
+        .cart {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px ;
+            margin: 20px ;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .cart ul {
+            list-style-type: none;
+        }
+
+        .cart ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Form pembayaran */
+        .payment {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .payment input, .payment select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        /* Form Voucher Diskon */
+        .voucher {
+            background-color: rgb(207, 121, 30);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .voucher input {
+            width: calc(100% - 120px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ff0000;
+            margin-right: 10px;
+        }
+
+        .voucher button {
+            background-color: #f19706;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.864); /* Menambahkan bayangan pada header */
+        }
+
+        .voucher button:hover {
+            background-color: #e67e22;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.864); /* Menambahkan bayangan pada header */
+        }
+
+        /* Penilaian dengan bintang */
+        .rating {
+            display: flex;
+            gap: 5px;
+        }
+
+        .rating i {
+            font-size: 24px;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .rating i.selected {
+            color: #f39c12;
+        }
+
+        /* Form saran */
+        .suggestion {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .suggestion textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            height: 100px;
+        }
+
+        #map {
+            width: 500px;
+            height: 300px;
+            display: none;
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: none;
+        }
+
+        .welcome-message h2 {
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 20px;
+        }
+
+        #close-welcome-message {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #close-welcome-message:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>ELNATHAN HAMBURGER</h1>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Cari produk..." onkeyup="searchProducts()">
+            <button class="search-btn">Cari</button>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <img src="https://img.freepik.com/premium-photo/national-cheeseburger-day-flat-illustration-design_1258570-13233.jpg?w=1380" alt="Iklan">
+    </div>
+
+    <div class="icon-menu">
+        <ul>
+            <li><a href="#"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="#"><i class="fas fa-shopping-cart"></i><span>Keranjang</span></a></li>
+            <li><a href="https://www.instagram.com/elnathaners?igsh=bW5kNHVrbWw3anZs"><i class="fas fa-user"></i><span>instagram</span></a></li>
+            <li><a href="https://berandawebsiteelnathannew.vercel.app/"><i class="fas fa-user"></i><span>WEB UTAMA</span></a></li>
+        </ul>
+    </div>
+
+    <div class="products-wrapper">
+        <div class="products" id="productList">
+            <div class="product-item" data-name="DOBBLE BEFF" data-price="120000">
+                <img src="https://png.pngtree.com/png-clipart/20230325/original/pngtree-juicy-burgers-with-a-transparent-background-png-image_9002761.png" alt="Produk 1">
+                <h3>DOBBLE BEFF</h3>
+                <p class="product-price">Rp120.000</p>
+                <button onclick="addToCart('DOBBLE BEFF', 120000)">Tambah ke Keranjang</button>
+            </div>
+            <div class="product-item" data-name="TRIPLE BEFF" data-price="150000">
+                <img src="https://th.bing.com/th/id/OIP.blZmAdaxWkCOvHgqcAdM-QHaJ4?w=735&h=980&rs=1&pid=ImgDetMain" alt="Produk 2">
+                <h3>TRIPLE BEFF</h3>
+                <p class="product-price">Rp150.000</p>
+                <button onclick="addToCart('TRIPLE BEFF', 150000)">Tambah ke Keranjang</button>
+            </div>
+            <div class="product-item" data-name="SAUSCE" data-price="30000">
+                <img src="https://th.bing.com/th/id/OIP.js6ui4RAkNggPdh40o3t9AHaHa?rs=1&pid=ImgDet&w=635&h=1145" alt="Produk 3">
+                <h3>SAUSCE</h3>
+                <p class="product-price">Rp30.000</p>
+                <button onclick="addToCart('POTATO MCD', 30000)">Tambah ke Keranjang</button>
+            </div> <div class="product-item" data-name="POTATO" data-price="30000">
+                <img src="https://th.bing.com/th/id/OIP.4baLbCyV9AS8UkCIJB44MwHaKL?rs=1&pid=ImgDetMain" alt="Produk 4">
+                <h3>POTATO MCD</h3>
+                <p class="product-price">Rp30.000</p>
+                <button onclick="addToCart('TEA ELNATHAN', 7000)">Tambah ke Keranjang</button>
+
+                
+            </div> <div class="product-item" data-name="TEA" data-price="30000">
+                <img src="https://cdn1.productnation.co/stg/sites/5/5da4108419929.png" alt="Produk 3">
+                <h3>TEA ELNATHAN</h3>
+                <p class="product-price">Rp7000</p>
+                <button onclick="addToCart('', 7000)">Tambah ke Keranjang</button>
+
+            </div> <div class="product-item" data-name="POP ICE" data-price="30000">
+                <img src="https://cdn.idntimes.com/content-images/community/2017/11/12-b9e2353b835316f2ff263220da3af4bd.jpg" alt="Produk 3">
+                <h3>POP ICE</h3>
+                <p class="product-price">Rp5000</p>
+                <button onclick="addToCart('KOPI', 5000)">Tambah ke Keranjang</button>
+
+            </div> <div class="product-item" data-name="KOPI" data-price="30000">
+                <img src="https://w7.pngwing.com/pngs/882/161/png-transparent-coffee-coffee-mug-coffee-beans-splash.png" alt="Produk 3">
+                <h3>KOPI</h3>
+                <p class="product-price">FREE</p>
+                <button onclick="addToCart('KOPI', 0)">Tambah ke Keranjang</button>
+            </div> <div class="product-item" data-name="TEA" data-price="30000">
+
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8P8SHoTlg9qtDQ5rhSEX-fU3qGdy9xm0NJhVkskqo9NOyXJlmDTIbsWGc8kmQxy9Qxyw-EBQidUJpIOIJBOcjSE1ozGrMZUcpDIhvpeWzoR1KujKwHR1PU6eKqHv3vu4douA9M6NwDmYlmslL31cAZ6tadFj3SRoPRovhs5A1LS-lnalX3KB6J3tr/w320-h320/gambar%20es%20buah%20cup%20png%20transparan%20keren.png" alt="Produk 3">
+                <h3>ES CAMPUR</h3>
+                <p class="product-price">Rp10.000</p>
+                <button onclick="addToCart('SAUSCE', 10000)">Tambah ke Keranjang</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="voucher">
+        <h 2>Voucher Diskon</h2>
+        <input type="text" id="voucherCode" placeholder="Masukkan kode voucher...">
+        <button onclick="applyDiscount()">Terapkan Diskon</button>
+        <p id="discountMessage"></p>
+    </div>
+
+    <div class="cart" id="cart">
+        <h2>Keranjang Belanja</h2>
+        <ul id="cart-items"></ul>
+        <p id="totalAmount">Total: Rp0</p>
+        <button onclick="showPayment()">Proses Pembayaran</button>
+    </div>
+    <div class="payment" id="payment" style="display: none;">
+        <h2>Form Pembayaran</h2>
+        <input type="text" id="userId" placeholder="Nama Pengguna" required>
+        <input type ="text" id="product" placeholder="Produk" disabled>
+        <input type="number" id="amount" placeholder="Jumlah" required>
+        <select id="paymentMethod" required>
+ <option value="" disabled selected>Pilih Metode Pembayaran</option>
+            <option value="Dana">Dana</option>
+        </select>
+        <button id="pilih-lokasi">Pilih Lokasi</button>
+        <a href="https://www.dana.id/" onclick="return validateForm()">
+            <button>Bayar</button>
+        </a>
+    </div>
+    <div id="map"></div>
+
+    <div id="welcome-message" class="welcome-message">
+        <h2>Selamat Datang di EL NATHAN HAMBURGER!</h2>
+        <p>(VOUCER DISKONYS ETH).</p>
+        <button id="close-welcome-message">Tutup</button>
+    </div>
+
+    <script>
+        let cart = [];
+        let totalAmount = 0;
+        let discount = 0;
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            totalAmount += price;
+            document.getElementById("cart").style.display = "block";
+            renderCartItems();
+        }
+
+        function renderCartItems() {
+            const cartItemsContainer = document.getElementById("cart-items");
+            cartItemsContainer.innerHTML = ""; // Clear previous items
+
+            cart.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = `${item.name} - Rp${item.price}`;
+                cartItemsContainer.appendChild(li);
+            });
+            const totalAfterDiscount = totalAmount - discount;
+            cartItemsContainer.innerHTML += `<li><strong>Total: Rp${totalAfterDiscount >= 0 ? totalAfterDiscount : 0}</strong></li>`;
+            document.getElementById("totalAmount").textContent = `Total: Rp${totalAfterDiscount >= 0 ? totalAfterDiscount : 0}`;
+            document.getElementById("product").value = cart.map(item => item.name).join(", ");
+        }
+
+        function showPayment() {
+            document.getElementById("payment").style.display = "block";
+        }
+
+        function applyDiscount() {
+            const voucherCode = document.getElementById("voucherCode").value;
+            if (voucherCode === "ETH") {
+                discount = totalAmount * 0.20; // 20% discount
+                document.getElementById("discountMessage").textContent = "Diskon 20% diterapkan!";
+            } else {
+                discount = 0;
+                document.getElementById("discountMessage").textContent = "Kode voucher tidak valid.";
+            }
+            renderCartItems();
+        }
+
+        function validateForm() {
+            const userId = document.getElementById("userId").value;
+            const amount = document.getElementById("amount").value;
+            const paymentMethod = document.getElementById("paymentMethod").value;
+
+            if (!userId || !amount || !paymentMethod) {
+                alert("Silakan isi semua informasi yang diperlukan.");
+                return false; // Stop further processing
+            }
+
+            return true; // Allow link to proceed
+        }
+
+        function processPayment() {
+            const userId = document.getElementById("userId").value;
+            const amount = document.getElementById("amount").value;
+            const paymentMethod = document.getElementById("paymentMethod").value;
+
+            if (!userId || !amount || !paymentMethod) {
+                alert("Silakan isi semua informasi yang diperlukan.");
+                return; // Stop further processing
+            }
+
+            const totalAfterDiscount = totalAmount - discount;
+
+            // Simulasi proses pembayaran
+            alert(`Pembayaran berhasil untuk ID Pengguna: ${userId}, Total: Rp${totalAfterDiscount >= 0 ? totalAfterDiscount : 0}, Metode Pembayaran: ${paymentMethod}`);
+            // Reset keranjang
+            cart = [];
+            totalAmount = 0;
+            discount = 0;
+            document.getElementById("cart").style.display = "none";
+            document.getElementById("payment").style.display = "none";
+            document.getElementById("voucherCode").value = "";
+            document.getElementById ("discountMessage").textContent = "";
+            renderCartItems();
+        }
+
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: -6.175392, lng: 106.824437 },
+                zoom: 13,
+            });
+
+            document.getElementById("pilih-lokasi").addEventListener("click", function() {
+                document.getElementById("map").style.display = "block";
+                const geocoder = new google.maps.Geocoder();
+
+                google.maps.event.addListener(map, "click", function(event) {
+                    const latLng = event.latLng;
+                    geocoder.geocode({ location: latLng }, function(results, status) {
+                        if (status === "OK") {
+                            const address = results[0].formatted_address;
+                            console.log(address);
+                            // Lakukan aksi lainnya setelah memilih lokasi
+                        }
+                    });
+                });
+            });
+        }
+
+        function showPayment() {
+            document.getElementById('payment').style.display = 'block';
+            document.getElementById('product').value = cart.map(item => item.name).join(', ');
+            initMap();
+        }
+
+        function searchProducts() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const productItems = document.querySelectorAll(".product-item");
+
+            productItems.forEach(item => {
+                const productName = item.getAttribute("data-name").toLowerCase();
+                if ( productName.includes(searchInput)) {
+                    item.style.display = "block"; // Menampilkan produk jika cocok
+                } else {
+                    item.style.display = "none"; // Menyembunyikan produk jika tidak cocok
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const welcomeMessage = document.getElementById("welcome-message");
+            const closeWelcomeMessage = document.getElementById("close-welcome-message");
+
+            setTimeout(function() {
+                welcomeMessage.style.display = "block";
+            }, 1000);
+
+            closeWelcomeMessage.addEventListener("click", function() {
+                welcomeMessage.style.display = "none";
+            });
+
+            // Hilangkan welcome message setelah 5 detik
+            setTimeout(function() {
+                welcomeMessage.style.display = "none";
+            }, 90000);
+        });
+    </script>
+</body>
+</html>
